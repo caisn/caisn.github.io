@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html>
+<head>
+<style> 
+div
+{
+width:100px;
+height:75px;
+background-color:red;
+border:1px solid black;
+}
+div#div2
+{
+-ms-transform:rotate(30deg); /* IE 9 */
+-webkit-transform:rotate(30deg); /* Chrome, Safari, Opera */
+transform:rotate(30deg); /* Standard syntax */
+}
+</style>
+</head>
 <body>
 
-<canvas id="myCanvas" width="200" height="100" style="border:1px solid #d3d3d3;">
-Your browser does not support the HTML5 canvas tag.</canvas>
+<div>Hello. This is a DIV element.</div>
 
-<script>
-
-var c=document.getElementById("myCanvas");
-var ctx=c.getContext("2d");
-ctx.moveTo(0,0);
-ctx.lineTo(200,100);
-ctx.stroke();
-
-</script>
+<div id="div2">Hello. This is a DIV element.</div>
 
 </body>
 </html>
