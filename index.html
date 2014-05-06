@@ -1,27 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
-<style> 
-div
-{
-width:100px;
-height:75px;
-background-color:red;
-border:1px solid black;
-}
-div#div2
-{
--ms-transform:rotate(30deg); /* IE 9 */
--webkit-transform:rotate(30deg); /* Chrome, Safari, Opera */
-transform:rotate(30deg); /* Standard syntax */
-}
-</style>
-</head>
 <body>
 
-<div>Hello. This is a DIV element.</div>
+<p>Click the button to loop through a block of code five times.</p>
+<button onclick="myFunction()">Try it</button>
+<p id="demo"></p>
 
-<div id="div2">Hello. This is a DIV element.</div>
+<script>
+function myFunction()
+{
+var x="";
+for (var i=0;i<5;i++)
+  {
+  x=x + "The number is " + i + "<br>";
+  }
+document.getElementById("demo").innerHTML=x;
+}
+</script>
 
 </body>
 </html>
