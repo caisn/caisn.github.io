@@ -2,20 +2,16 @@
 <html>
 <body>
 
-<p>Click the button to loop through a block of code five times.</p>
-<button onclick="myFunction()">Try it</button>
-<p id="demo"></p>
+<canvas id="myCanvas" width="200" height="100" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
 
 <script>
-function myFunction()
-{
-var x="";
-for (var i=0;i<5;i++)
-  {
-  x=x + "The number is " + i + "<br>";
-  }
-document.getElementById("demo").innerHTML=x;
-}
+
+var c=document.getElementById("myCanvas");
+var ctx=c.getContext("2d");
+ctx.font="30px Arial";
+ctx.strokeText("caisn's Home Page",10,50);
+
 </script>
 
 </body>
