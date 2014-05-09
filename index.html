@@ -12,6 +12,7 @@
 			var c1,c2,ctx1,ctx2;
 			var snake = {
 				run : null,
+				paused : 1,
 				ptlist : [ [18,19], [19,19], [20,19], [21,19] ],
 				ori : [-1,0],
 				step : function() {
@@ -24,58 +25,91 @@
 				},
 				init : function() {
 					c2=document.getElementById("Canvas2");
-					c2.width=c2.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-c1.height),200)/40)*40;
 					ctx2=c2.getContext("2d");
-					for(var i=0;i<this.ptlist.length;i++){
-						ctx2.fillRect(this.ptlist[i][0]*(c2.width/40)+1, this.ptlist[i][1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
-					}
+					drawSnake();
+					this.begin();
+				},
+				begin : function(){
+					window.addEventListener( "keydown", control, false );
+					this.continue();
+				},
+				stop_s : function(){
+					this.pause();
+					window.removeEventListener( "keydown", control, false );
+				},
+				pause : function() {
+					clearInterval(this.run);
+					this.paused = 1;
+				},
+				continue : function() {
 					this.run = setInterval(function(){snake.step()},100);
-					window.addEventListener( "keydown", control, true );
+					this.paused = 0;
 				}
 			};
 			function init(){
 				c1=document.getElementById("Canvas1");
-				c1.width = window.innerWidth/10*9;
-        c1.height = Math.min(c1.width/2,window.innerHeight/2);
 				ctx1=c1.getContext("2d");
-				ctx1.font=c1.width/10 + "px Arial";
-				ctx1.strokeText("Caisn's Home Page",c1.width/20,c1.height/3);
+				drawC1();
 				snake.init();
-				window.addEventListener( "resize", redraw, true );
+				window.addEventListener( "resize", redraw, false );
 				document.getElementById("demo").innerHTML = c1.width + " " + c1.height + " " + c2.width + " " + c2.height;
 			}
 			function control(event){
-				//alert("You pressed a key inside the input field " + event.keyCode);
-				switch(event.keyCode){
-					case 37:
-					if(snake.ori[0]!=1){
-						snake.ori=[-1,0];
+				//alert(event.keyCode);
+				if(!snake.paused){
+					switch(event.keyCode){
+						case 37:
+						if(snake.ori[0]!=1){
+							snake.ori=[-1,0];
+						}
+						break;
+						case 38:
+						if(snake.ori[1]!=1){
+							snake.ori=[0,-1];
+						}
+						break;
+						case 39:
+						if(snake.ori[0]!=-1){
+							snake.ori=[1,0];
+						}
+						break;
+						case 40:
+						if(snake.ori[1]!=-1){
+							snake.ori=[0,1];
+						}
+						break;
 					}
-					break;
-					case 38:
-					if(snake.ori[1]!=1){
-						snake.ori=[0,-1];
-					}
-					break;
-					case 39:
-					if(snake.ori[0]!=-1){
-						snake.ori=[1,0];
-					}
-					break;
-					case 40:
-					if(snake.ori[1]!=-1){
-						snake.ori=[0,1];
-					}
-					break;
 				}
+				switch(event.keyCode){
+						case 32:
+						if(snake.paused){
+							snake.continue();
+						}
+						else{
+							snake.pause();
+						}
+					}
 			}
 			function redraw(){
 				ctx1.clearRect(0,0,c1.width,c1.height);
+				drawC1();
+				
+				snake.pause();
+				ctx2.clearRect(0,0,c2.width,c2.height);
+				drawSnake();
+				snake.continue();
+			}
+			function drawC1(){
 				c1.width = window.innerWidth/10*9;
         c1.height = Math.min(c1.width/2,window.innerHeight/2);
 				ctx1.font=c1.width/10 + "px Arial";
 				ctx1.strokeText("Caisn's Home Page",c1.width/20,c1.height/3);
-				//c2.width=c2.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-c1.height),200)/40)*40;
+			}
+			function drawSnake(){
+				c2.width=c2.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-c1.height),200)/40)*40;
+				for(var i=0;i<snake.ptlist.length;i++){
+					ctx2.fillRect(snake.ptlist[i][0]*(c2.width/40)+1, snake.ptlist[i][1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
+				}
 			}
 		</script>
 	</body>
