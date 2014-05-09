@@ -1,18 +1,82 @@
 <!DOCTYPE html>
 <html>
-<body>
-
-<canvas id="myCanvas" width="1000" height="400">
-Your browser does not support the HTML5 canvas tag.</canvas>
-
-<script>
-
-var c=document.getElementById("myCanvas");
-var ctx=c.getContext("2d");
-ctx.font="100px Arial";
-ctx.strokeText("Caisn's Home Page",30,200);
-
-</script>
-
-</body>
+	<body onload="init();">
+		<canvas id="Canvas1">
+		Your browser does not support the HTML5 canvas tag.</canvas>
+		<canvas id="Canvas2">
+		</canvas>
+		
+		<p id="demo"></p>
+		
+		<script>
+			var c1,c2,ctx1,ctx2;
+			var snake = {
+				run : null,
+				ptlist : [ [18,19], [19,19], [20,19], [21,19] ],
+				ori : [-1,0],
+				step : function() {
+					var head = [(this.ptlist[0][0]+this.ori[0]+40)%40, (this.ptlist[0][1]+this.ori[1]+40)%40];
+					this.ptlist.splice(0,0,head);
+					var tail = this.ptlist.pop();
+					
+					ctx2.fillRect(head[0]*(c2.width/40)+1, head[1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
+					ctx2.clearRect(tail[0]*(c2.width/40)+1, tail[1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
+				},
+				init : function() {
+					c2=document.getElementById("Canvas2");
+					c2.width=c2.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-c1.height),200)/40)*40;
+					ctx2=c2.getContext("2d");
+					for(var i=0;i<this.ptlist.length;i++){
+						ctx2.fillRect(this.ptlist[i][0]*(c2.width/40)+1, this.ptlist[i][1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
+					}
+					this.run = setInterval(function(){snake.step()},100);
+					window.addEventListener( "keydown", control, true );
+				}
+			};
+			function init(){
+				c1=document.getElementById("Canvas1");
+				c1.width = window.innerWidth/10*9;
+        c1.height = Math.min(c1.width/2,window.innerHeight/2);
+				ctx1=c1.getContext("2d");
+				ctx1.font=c1.width/10 + "px Arial";
+				ctx1.strokeText("Caisn's Home Page",c1.width/20,c1.height/3);
+				snake.init();
+				window.addEventListener( "resize", redraw, true );
+				document.getElementById("demo").innerHTML = c1.width + " " + c1.height + " " + c2.width + " " + c2.height;
+			}
+			function control(event){
+				//alert("You pressed a key inside the input field " + event.keyCode);
+				switch(event.keyCode){
+					case 37:
+					if(snake.ori[0]!=1){
+						snake.ori=[-1,0];
+					}
+					break;
+					case 38:
+					if(snake.ori[1]!=1){
+						snake.ori=[0,-1];
+					}
+					break;
+					case 39:
+					if(snake.ori[0]!=-1){
+						snake.ori=[1,0];
+					}
+					break;
+					case 40:
+					if(snake.ori[1]!=-1){
+						snake.ori=[0,1];
+					}
+					break;
+				}
+			}
+			function redraw(){
+				ctx1.clearRect(0,0,c1.width,c1.height);
+				c1.width = window.innerWidth/10*9;
+        c1.height = Math.min(c1.width/2,window.innerHeight/2);
+				ctx1.font=c1.width/10 + "px Arial";
+				ctx1.strokeText("Caisn's Home Page",c1.width/20,c1.height/3);
+				//c2.width=c2.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-c1.height),200)/40)*40;
+			}
+		</script>
+	</body>
 </html>
