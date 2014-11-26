@@ -6,15 +6,16 @@
 		<canvas id="GameHead"></canvas>
 		<br />
 		<canvas id="GameMain"></canvas>
+		<p id="demo"></p>
 		<script>
 			var title,game_head,game_main,title_context,game_head_context,game_main_context;
 			var snake = {
 				run : null,
 				paused : 1,
 				dead : 0,
-				body : [ [18,19], [19,19], [20,19], [21,19] ],
-				ori : [-1,0],
-				food : [-1,-1],
+				body : null,
+				ori : null,
+				food : null,
 				step : function() {
 					var next_head = [(this.body[0][0]+this.ori[0]+40)%40, (this.body[0][1]+this.ori[1]+40)%40];
 					var pre_tail = this.body.pop();
@@ -51,30 +52,32 @@
 					game_main_context=game_main.getContext("2d");
 					/*this.food = this.next_food();
 					drawSnake();*/
-					this.begin();
+					this.restart();
 					window.addEventListener( "keydown", control, false );
 				},
-				begin : function(){
+				restart : function(){
 					//window.addEventListener( "keydown", control, false );
+					this.pause();
 					this.dead = 0;
 					this.body = [ [18,19], [19,19], [20,19], [21,19] ];
+					this.ori = [-1,0];
 					this.food = this.next_food();
 					redrawSnake();
 					//this.continue();
 				},
 				stop_s : function(){
-					this.pause();
 					this.dead = 1;
+					this.pause();
 					//this.pause();
 					//window.removeEventListener( "keydown", control, false );
 				},
 				pause : function() {
-					clearInterval(this.run);
 					this.paused = 1;
+					clearInterval(this.run);
 				},
 				continue : function() {
-					this.run = setInterval(function(){snake.step()},75);
 					this.paused = 0;
+					this.run = setInterval(function(){snake.step()},75);
 				},
 				next_food : function(){
 					while(true){
@@ -135,16 +138,24 @@
 				switch(event.keyCode){
 						case 32:
 						if(snake.paused){
-							if(snake.dead){
-								snake.begin();
+							/*if(snake.dead){
+								//alert("0");
+								snake.restart();
 							}
-							else{
+							else{*/
+							if(!snake.dead){
+								//alert("1");
 								snake.continue();
 							}
 						}
 						else{
+							//alert("9");
 							snake.pause();
 						}
+						break;
+						case 82:
+						snake.restart();
+						break;
 					}
 			}
 			function redraw(){
@@ -160,6 +171,7 @@
 				if(!snake.paused){
 					snake.continue();
 				}
+				document.getElementById("demo").innerHTML = snake.paused + " " + snake.dead + " " + snake.food + " " + snake.body;
 			}
 			function drawtitle(){
 				title.width = window.innerWidth/10*9;
