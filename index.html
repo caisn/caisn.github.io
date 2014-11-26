@@ -1,58 +1,109 @@
 <!DOCTYPE html>
 <html>
 	<body onload="init();">
-		<canvas id="Canvas1">
-		Your browser does not support the HTML5 canvas tag.</canvas>
-		<canvas id="Canvas2">
-		</canvas>
-		
-		<p id="demo"></p>
-		
+		<canvas id="Title">Your browser does not support the HTML5 canvas.</canvas>
+		<br />
+		<canvas id="GameHead"></canvas>
+		<br />
+		<canvas id="GameMain"></canvas>
 		<script>
-			var c1,c2,ctx1,ctx2;
+			var title,game_head,game_main,title_context,game_head_context,game_main_context;
 			var snake = {
 				run : null,
 				paused : 1,
-				ptlist : [ [18,19], [19,19], [20,19], [21,19] ],
+				dead : 0,
+				body : [ [18,19], [19,19], [20,19], [21,19] ],
 				ori : [-1,0],
+				food : [-1,-1],
 				step : function() {
-					var head = [(this.ptlist[0][0]+this.ori[0]+40)%40, (this.ptlist[0][1]+this.ori[1]+40)%40];
-					this.ptlist.splice(0,0,head);
-					var tail = this.ptlist.pop();
+					var next_head = [(this.body[0][0]+this.ori[0]+40)%40, (this.body[0][1]+this.ori[1]+40)%40];
+					var pre_tail = this.body.pop();
 					
-					ctx2.fillRect(head[0]*(c2.width/40)+1, head[1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
-					ctx2.clearRect(tail[0]*(c2.width/40)+1, tail[1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
+					var i;
+					for(i=0;i<snake.body.length;i++){
+						if(snake.body[i][0] == next_head[0] && snake.body[i][1] == next_head[1]){
+							break;
+						}
+					}
+					if(i<snake.body.length){
+						this.stop_s();
+						return;
+					}
+					
+					this.body.splice(0,0,next_head);
+					
+					if(snake.food[0] == next_head[0] && snake.food[1] == next_head[1]){
+						this.body.splice(-1,0,pre_tail);
+						this.food = this.next_food();
+						game_main_context.fillRect(snake.food[0]*(game_main.width/40)+1, snake.food[1]*(game_main.width/40)+1, (game_main.width/40)-2, (game_main.width/40)-2);
+					}
+					else{
+						game_main_context.fillRect(next_head[0]*(game_main.width/40)+1, next_head[1]*(game_main.width/40)+1, (game_main.width/40)-2, (game_main.width/40)-2);
+						game_main_context.clearRect(pre_tail[0]*(game_main.width/40)+1, pre_tail[1]*(game_main.width/40)+1, (game_main.width/40)-2, (game_main.width/40)-2);
+					}
+					
 				},
 				init : function() {
-					c2=document.getElementById("Canvas2");
-					ctx2=c2.getContext("2d");
-					drawSnake();
+					game_head=document.getElementById("GameHead");
+					game_head_context=game_head.getContext("2d");
+					
+					game_main=document.getElementById("GameMain");
+					game_main_context=game_main.getContext("2d");
+					/*this.food = this.next_food();
+					drawSnake();*/
 					this.begin();
+					window.addEventListener( "keydown", control, false );
 				},
 				begin : function(){
-					window.addEventListener( "keydown", control, false );
-					this.continue();
+					//window.addEventListener( "keydown", control, false );
+					this.dead = 0;
+					this.body = [ [18,19], [19,19], [20,19], [21,19] ];
+					this.food = this.next_food();
+					redrawSnake();
+					//this.continue();
 				},
 				stop_s : function(){
+					this.dead = 1;
 					this.pause();
-					window.removeEventListener( "keydown", control, false );
+					//window.removeEventListener( "keydown", control, false );
 				},
 				pause : function() {
 					clearInterval(this.run);
 					this.paused = 1;
 				},
 				continue : function() {
-					this.run = setInterval(function(){snake.step()},100);
+					this.run = setInterval(function(){snake.step()},75);
 					this.paused = 0;
+				},
+				next_food : function(){
+					while(true){
+						var a = Math.floor(Math.random() * 40);
+						var b = Math.floor(Math.random() * 40);
+						var i;
+						for(i=0;i<snake.body.length;i++){
+							if(snake.body[i][0] == a && snake.body[i][1] == b){
+								break;
+							}
+						}
+						if(i>=snake.body.length){
+							/*var arr = new Array();
+							arr[0] = a;
+							arr[1] = b;
+							return arr;*/
+							return [a,b];
+						}
+					}
 				}
 			};
 			function init(){
-				c1=document.getElementById("Canvas1");
-				ctx1=c1.getContext("2d");
-				drawC1();
+				title=document.getElementById("Title");
+				title_context=title.getContext("2d");
+				drawtitle();
 				snake.init();
+				//document.getElementById("demo").innerHTML = title.width + " " + title.height + " " + game_main.width + " " + game_main.height;
 				window.addEventListener( "resize", redraw, false );
-				document.getElementById("demo").innerHTML = c1.width + " " + c1.height + " " + c2.width + " " + c2.height;
+				
+				
 			}
 			function control(event){
 				//alert(event.keyCode);
@@ -83,7 +134,12 @@
 				switch(event.keyCode){
 						case 32:
 						if(snake.paused){
-							snake.continue();
+							if(snake.dead){
+								snake.begin();
+							}
+							else{
+								snake.continue();
+							}
 						}
 						else{
 							snake.pause();
@@ -91,25 +147,42 @@
 					}
 			}
 			function redraw(){
-				ctx1.clearRect(0,0,c1.width,c1.height);
-				drawC1();
-				
-				snake.pause();
-				ctx2.clearRect(0,0,c2.width,c2.height);
+				title_context.clearRect(0,0,title.width,title.height);
+				drawtitle();
+				if(!snake.paused){
+					snake.pause();
+					snake.paused = 0;
+				}
+				game_head_context.clearRect(0,0,game_head.width,game_head.height);
+				game_main_context.clearRect(0,0,game_main.width,game_main.height);
 				drawSnake();
-				snake.continue();
+				if(!snake.paused){
+					snake.continue();
+				}
 			}
-			function drawC1(){
-				c1.width = window.innerWidth/10*9;
-        c1.height = Math.min(c1.width/2,window.innerHeight/2);
-				ctx1.font=c1.width/10 + "px Arial";
-				ctx1.strokeText("Caisn's Home Page",c1.width/20,c1.height/3);
+			function drawtitle(){
+				title.width = window.innerWidth/10*9;
+				title.height = Math.min(title.width/2,window.innerHeight/2);
+				//title_context.font=title.width/10 + "px Arial";
+				title_context.font=title.height/5 + "px Arial";
+				title_context.strokeText("Caisn's Home Page",title.width/20,title.height/3);
 			}
 			function drawSnake(){
-				c2.width=c2.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-c1.height),200)/40)*40;
-				for(var i=0;i<snake.ptlist.length;i++){
-					ctx2.fillRect(snake.ptlist[i][0]*(c2.width/40)+1, snake.ptlist[i][1]*(c2.width/40)+1, (c2.width/40)-2, (c2.width/40)-2);
+				game_head.width=title.width;
+				game_head.height=title.height/8;
+				//game_head.width=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-title.height-game_head.height),200)/40)*40;
+				game_head_context.font=title.height/16 + "px Arial";
+				game_head_context.strokeText("space : continue/pause/restart, arrow : controll the snake.",game_head.width/20,game_head.height/3);
+				game_main.width=game_main.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-title.height-game_head.height),200)/40)*40;
+				for(var i=0;i<snake.body.length;i++){
+					game_main_context.fillRect(snake.body[i][0]*(game_main.width/40)+1, snake.body[i][1]*(game_main.width/40)+1, (game_main.width/40)-2, (game_main.width/40)-2);
 				}
+				game_main_context.fillRect(snake.food[0]*(game_main.width/40)+1, snake.food[1]*(game_main.width/40)+1, (game_main.width/40)-2, (game_main.width/40)-2);
+			}
+			function redrawSnake(){
+				game_head_context.clearRect(0,0,game_head.width,game_head.height);
+				game_main_context.clearRect(0,0,game_main.width,game_main.height);
+				drawSnake();
 			}
 		</script>
 	</body>
