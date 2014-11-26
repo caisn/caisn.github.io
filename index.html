@@ -6,7 +6,9 @@
 		<canvas id="GameHead"></canvas>
 		<br />
 		<canvas id="GameMain"></canvas>
+		<!--
 		<p id="demo"></p>
+		-->
 		<script>
 			var title,game_head,game_main,title_context,game_head_context,game_main_context;
 			var snake = {
@@ -185,7 +187,7 @@
 				game_head.height=title.height/8;
 				//game_head.width=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-title.height-game_head.height),200)/40)*40;
 				game_head_context.font=title.height/16 + "px Arial";
-				game_head_context.strokeText("space : continue/pause/restart, arrow : controll the snake.",game_head.width/20,game_head.height/3);
+				game_head_context.strokeText("Space : continue/pause, R : restart, Arrows : controll the snake.",game_head.width/20,game_head.height/3);
 				game_main.width=game_main.height=Math.floor(Math.max(Math.min(window.innerWidth,window.innerHeight-title.height-game_head.height),200)/40)*40;
 				for(var i=0;i<snake.body.length;i++){
 					game_main_context.fillRect(snake.body[i][0]*(game_main.width/40)+1, snake.body[i][1]*(game_main.width/40)+1, (game_main.width/40)-2, (game_main.width/40)-2);
